@@ -36,6 +36,7 @@ class Title(models.Model):
     name = models.CharField(max_length=256, verbose_name='Произведение')
     year = models.IntegerField(verbose_name='Год', null=True,)
     description = models.TextField(blank=True,
+                                   null=True,
                                    verbose_name='Описание')
     category = models.ForeignKey(Category, on_delete=models.SET_NULL,
                                  null=True, related_name="titles")
