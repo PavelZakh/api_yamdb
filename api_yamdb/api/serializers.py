@@ -6,7 +6,8 @@ from reviews.models import Reviews, Comments
 class ReviewsSerializer(serializers.ModelSerializer):
 
     class Meta:
-        fields = '__all__'
+        # fields = '__all__'
+        exclude = ('title_id',)
         model = Reviews
 
     def validate(self, data):
