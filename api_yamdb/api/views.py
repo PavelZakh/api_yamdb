@@ -10,8 +10,17 @@ class ReviewsViewSet(viewsets.ModelViewSet):
     serializer_class = ReviewsSerializer
     pagination_class = PageNumberPagination
 
+    def perform_create(self, serializer):
+        serializer.save(author=self.request.user,
+                        title_id=self.kwargs["title_id"])
+
 
 class CommentsViewSet(viewsets.ModelViewSet):
-    queryset = Reviews.objects.all()
+    queryset = Comments.objects.all()
     serializer_class = CommentsSerializer
     pagination_class = PageNumberPagination
+
+    def perform_create(self, serializer):
+        serializer.save(author=self.request.user,
+                        title_id=self.kwargs["title_id"],
+                        review_id=self.kwargs["review_id"])

@@ -2,12 +2,13 @@ from django.db import models
 
 
 class Reviews(models.Model):
-    '''
+    pass
+'''
     title_id = models.ForeignKey(
-        # Titles, on_delete=models.CASCADE, related_name='review'
+        Titles, on_delete=models.CASCADE, related_name='review'
     )
     author = models.ForeignKey(
-        # Users, on_delete=models.CASCADE, related_name='review'
+        Users, on_delete=models.CASCADE, related_name='review'
     )
     text = models.TextField()
     score = models.IntegerField()
@@ -16,8 +17,8 @@ class Reviews(models.Model):
     )
 '''
 
+
 class Comments(models.Model):
-    '''
     title_id = models.ForeignKey(
         # Titles, on_delete=models.CASCADE, related_name='comments'
     )
@@ -31,4 +32,3 @@ class Comments(models.Model):
     pub_date = models.DateTimeField(
         'Comment publication date', auto_now_add=True
     )
-'''

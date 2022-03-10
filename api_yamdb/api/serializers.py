@@ -23,6 +23,10 @@ class ReviewsSerializer(serializers.ModelSerializer):
 
 
 class CommentsSerializer(serializers.ModelSerializer):
+    author = serializers.StringRelatedField(read_only=True)
+    id = serializers.PrimaryKeyRelatedField(read_only=True)
+
+
     class Meta:
-        fields = '__all__'
+        fields = ('id', 'text', 'author', 'pub_date')
         model = Comments
