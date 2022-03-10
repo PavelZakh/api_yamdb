@@ -4,7 +4,7 @@ from rest_framework.mixins import (CreateModelMixin, DestroyModelMixin,
 from rest_framework.pagination import PageNumberPagination
 from rest_framework.viewsets import GenericViewSet, ModelViewSet
 
-from .models import Categories, Genres, Titles
+from ..reviews.models import Categories, Genres, Titles
 from .serializers import (CategorySerializer,
                           GenreSerializer,
                           TitleCreateSerializer, TitleListSerializer)
