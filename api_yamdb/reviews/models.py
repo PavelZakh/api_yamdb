@@ -2,8 +2,6 @@ from django.db import models
 
 
 class Reviews(models.Model):
-    pass
-'''
     title_id = models.ForeignKey(
         Titles, on_delete=models.CASCADE, related_name='review'
     )
@@ -15,15 +13,14 @@ class Reviews(models.Model):
     pub_date = models.DateTimeField(
         'Review publication date', auto_now_add=True
     )
-'''
 
 
 class Comments(models.Model):
     title_id = models.ForeignKey(
-        # Titles, on_delete=models.CASCADE, related_name='comments'
+        Titles, on_delete=models.CASCADE, related_name='comments'
     )
     author = models.ForeignKey(
-        # Users, on_delete=models.CASCADE, related_name='comments'
+        Users, on_delete=models.CASCADE, related_name='comments'
     )
     review_id = models.ForeignKey(
         Reviews, on_delete=models.CASCADE, related_name='comments'

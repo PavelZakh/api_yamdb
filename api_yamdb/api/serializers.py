@@ -4,11 +4,15 @@ from reviews.models import Reviews, Comments
 
 
 class ReviewsSerializer(serializers.ModelSerializer):
+    author = serializers.SlugRelatedField(
+        read_only=True,
+        slug_field='username'
+    )
 
     class Meta:
-        # fields = '__all__'
         exclude = ('title_id',)
         model = Reviews
+        read_only_fields = ('author', 'pub_date')
 
     def validate(self, data):
         if not isinstance(data['score'], int):
@@ -23,10 +27,12 @@ class ReviewsSerializer(serializers.ModelSerializer):
 
 
 class CommentsSerializer(serializers.ModelSerializer):
-    author = serializers.StringRelatedField(read_only=True)
-    id = serializers.PrimaryKeyRelatedField(read_only=True)
-
+    author = serializers.SlugRelatedField(
+        read_only=True,
+        slug_field='username'
+    )
 
     class Meta:
-        fields = ('id', 'text', 'author', 'pub_date')
+        exclude = ('title_id',)
         model = Comments
+        read_only_fields = ('title_id', 'review_id', 'pub_date')
