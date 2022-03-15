@@ -1,19 +1,26 @@
 from api_yamdb.settings import EMAIL_HOST_USER
 from django.contrib.auth.tokens import default_token_generator
 from django.core.mail import send_mail
+from django.db.models import Avg
 from django.http import HttpResponse
 from django.shortcuts import get_object_or_404
 from rest_framework import status, viewsets
 from rest_framework.decorators import action, api_view, permission_classes
-from rest_framework.permissions import (AllowAny, IsAuthenticated)
-from rest_framework.response import Response
+from rest_framework.mixins import (CreateModelMixin, DestroyModelMixin,
+                                   ListModelMixin)
 from rest_framework.pagination import PageNumberPagination
+from rest_framework.permissions import AllowAny, IsAuthenticated
+from rest_framework.response import Response
+from rest_framework.viewsets import GenericViewSet, ModelViewSet
 from rest_framework_simplejwt.tokens import RefreshToken
-from reviews.models import User, Reviews, Comments
+from reviews.models import Categories, Comments, Genres, Reviews, Titles, User
 
 from api.permissions import IsAdminOrSuperUser
-from api.serializers import (ConfirmationCodeSerializer, EmailSerializer,
-                             UserSerializer, ReviewsSerializer, CommentsSerializer)
+from api.serializers import (CategorySerializer, CommentsSerializer,
+                             ConfirmationCodeSerializer, EmailSerializer,
+                             GenreSerializer, ReviewsSerializer,
+                             TitleCreateSerializer, TitleListSerializer,
+                             UserSerializer)
 
 
 @api_view(['POST'])
@@ -104,3 +111,34 @@ class CommentsViewSet(viewsets.ModelViewSet):
         serializer.save(author=self.request.user,
                         title_id=self.kwargs["title_id"],
                         review_id=self.kwargs["review_id"])
+
+
+class TitlesViewSet(ModelViewSet):
+    queryset = Titles.objects.annotate(
+        rating=Avg('reviews__score')).order_by('id')
+
+    def get_serializer_class(self):
+        if self.action in ('create', 'update', 'partial_update'):
+            return TitleCreateSerializer
+        return TitleListSerializer
+
+
+class CreateListDestroyViewSet(ListModelMixin,
+                               CreateModelMixin,
+                               DestroyModelMixin,
+                               GenericViewSet):
+    pagination_class = PageNumberPagination
+
+
+class CategoryViewSet(CreateListDestroyViewSet):
+    queryset = Categories.objects.all().order_by('id')
+    serializer_class = CategorySerializer
+    search_fields = ['name']
+    lookup_field = 'slug'
+
+
+class GenreViewSet(CreateListDestroyViewSet):
+    queryset = Genres.objects.all().order_by('id')
+    serializer_class = GenreSerializer
+    search_fields = ['name']
+    lookup_field = 'slug'
