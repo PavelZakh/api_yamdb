@@ -7,12 +7,13 @@ from rest_framework import status, viewsets
 from rest_framework.decorators import action, api_view, permission_classes
 from rest_framework.permissions import (AllowAny, IsAuthenticated)
 from rest_framework.response import Response
+from rest_framework.pagination import PageNumberPagination
 from rest_framework_simplejwt.tokens import RefreshToken
-from reviews.models import User
+from reviews.models import User, Reviews, Comments
 
 from api.permissions import IsAdminOrSuperUser
 from api.serializers import (ConfirmationCodeSerializer, EmailSerializer,
-                             UserSerializer)
+                             UserSerializer, ReviewsSerializer, CommentsSerializer)
 
 
 @api_view(['POST'])
@@ -72,3 +73,34 @@ class UserViewSet(viewsets.ModelViewSet):
         serializer.is_valid(raise_exception=True)
         serializer.save(role=user.role, partial=True)
         return Response(serializer.data, status=status.HTTP_200_OK)
+
+
+class ReviewsViewSet(viewsets.ModelViewSet):
+    """View Set for Reviews."""
+    queryset = Reviews.objects.all()
+    serializer_class = ReviewsSerializer
+    pagination_class = PageNumberPagination
+    # permission_classes =
+
+    def perform_create(self, serializer):
+        serializer.save(author=self.request.user,
+                        title_id=self.kwargs["title_id"])
+
+
+class CommentsViewSet(viewsets.ModelViewSet):
+    """View Set for Comments."""
+    queryset = Comments.objects.all()
+    serializer_class = CommentsSerializer
+    pagination_class = PageNumberPagination
+    # permission_classes =
+
+    def get_queryset(self):
+        review_id = self.kwargs.get("review_id")
+        get_object_or_404(Reviews, id=review_id)
+        queryset = Comments.objects.filter(review_id__exact=review_id)
+        return queryset
+
+    def perform_create(self, serializer):
+        serializer.save(author=self.request.user,
+                        title_id=self.kwargs["title_id"],
+                        review_id=self.kwargs["review_id"])
