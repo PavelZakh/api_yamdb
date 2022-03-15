@@ -17,7 +17,7 @@ router.register("genres", GenreViewSet, basename='Genre')
 router.register("categories", CategoryViewSet, basename='Category')
 
 router_r = SimpleRouter()
-router_r.register(r'titles/(?P<title_id>\d+)/reviews', ReviewsViewSet)
+router_r.register(r'titles/(?P<title_id>\d+)/reviews/', ReviewsViewSet)
 router_r.register(r'titles/(?P<title_id>\d+)/reviews/(?P<review_id>\d+)/comments', CommentsViewSet)
 
 urlpatterns = [

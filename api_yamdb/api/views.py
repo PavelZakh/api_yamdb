@@ -16,10 +16,10 @@ from rest_framework_simplejwt.tokens import RefreshToken
 from reviews.models import Categories, Comments, Genres, Reviews, Titles, User
 
 from api.permissions import IsAdminOrSuperUser
-from api.serializers import (CategorySerializer, CommentsSerializer,
+from api.serializers import (CategoriesSerializer, CommentsSerializer, 
                              ConfirmationCodeSerializer, EmailSerializer,
-                             GenreSerializer, ReviewsSerializer,
-                             TitleCreateSerializer, TitleListSerializer,
+                             GenresSerializer, ReviewsSerializer,
+                             TitleGetSerializer, TitlesSerializer,
                              UserSerializer)
 
 
@@ -115,12 +115,12 @@ class CommentsViewSet(viewsets.ModelViewSet):
 
 class TitlesViewSet(ModelViewSet):
     queryset = Titles.objects.annotate(
-        rating=Avg('reviews__score')).order_by('id')
+        rating=Avg('review__score')).order_by('id')
 
     def get_serializer_class(self):
         if self.action in ('create', 'update', 'partial_update'):
-            return TitleCreateSerializer
-        return TitleListSerializer
+            return TitlesSerializer
+        return TitleGetSerializer
 
 
 class CreateListDestroyViewSet(ListModelMixin,
@@ -132,13 +132,13 @@ class CreateListDestroyViewSet(ListModelMixin,
 
 class CategoryViewSet(CreateListDestroyViewSet):
     queryset = Categories.objects.all().order_by('id')
-    serializer_class = CategorySerializer
+    serializer_class = CategoriesSerializer
     search_fields = ['name']
     lookup_field = 'slug'
 
 
 class GenreViewSet(CreateListDestroyViewSet):
-    queryset = Genres.objects.all().order_by('id')
-    serializer_class = GenreSerializer
+    queryset = Genres.objects.all()
+    serializer_class = GenresSerializer
     search_fields = ['name']
     lookup_field = 'slug'
