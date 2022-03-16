@@ -17,7 +17,13 @@ class IsAdminOrReadOnly(permissions.BasePermission):
                 )
 
 
-class IsAuthenticatedOrReadOnly(permissions.BasePermission):
+class CommentReviewPermissios(permissions.BasePermission):
+    message = 'Изменение чужого контента запрещено!'
+
     def has_permission(self, request, view):
-        return (request.method in permissions.SAFE_METHODS
-                or request.user.is_authenticated)
+        if request.method in permissions.SAFE_METHODS:
+            return True
+        elif request.method == "PATCH":
+            return request.user.is_authenticated and request.user.role == 'admin'
+        else:
+            return request.user.is_authenticated and request.user.role

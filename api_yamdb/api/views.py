@@ -15,7 +15,7 @@ from rest_framework.viewsets import GenericViewSet, ModelViewSet
 from rest_framework_simplejwt.tokens import RefreshToken
 from reviews.models import Categories, Comments, Genres, Reviews, Titles, User
 
-from api.permissions import IsAdminOrSuperUser, IsAuthenticatedOrReadOnly
+from api.permissions import IsAdminOrSuperUser, CommentReviewPermissios
 from api.serializers import (CategoriesSerializer, CommentsSerializer, 
                              ConfirmationCodeSerializer, EmailSerializer,
                              GenresSerializer, ReviewsSerializer,
@@ -87,7 +87,7 @@ class ReviewsViewSet(viewsets.ModelViewSet):
     queryset = Reviews.objects.all()
     serializer_class = ReviewsSerializer
     pagination_class = PageNumberPagination
-    permission_classes = (IsAuthenticatedOrReadOnly,)
+    permission_classes = (CommentReviewPermissios,)
 
     def perform_create(self, serializer):
         serializer.save(author=self.request.user,
@@ -98,7 +98,7 @@ class CommentsViewSet(viewsets.ModelViewSet):
     """View Set for Comments."""
     serializer_class = CommentsSerializer
     pagination_class = PageNumberPagination
-    permission_classes = (IsAuthenticatedOrReadOnly,)
+    permission_classes = (CommentReviewPermissios,)
 
     def get_queryset(self):
         review_id = self.kwargs.get("review_id")
