@@ -1,4 +1,5 @@
 from django.contrib.auth.models import AbstractUser
+from django.core.validators import MinValueValidator, MaxValueValidator
 from django.db import models
 
 
@@ -52,8 +53,8 @@ class Titles(models.Model):
     genre = models.ManyToManyField(Genres, blank=True, related_name="titles")
 
     class Meta:
-        verbose_name = ('title')
-        verbose_name_plural = ('titles')
+        verbose_name = 'title'
+        verbose_name_plural = 'titles'
 
     def __str__(self):
         return self.name
@@ -97,27 +98,27 @@ class User(AbstractUser):
 
 
 class Reviews(models.Model):
-    title_id = models.ForeignKey(
+    title = models.ForeignKey(
         Titles, on_delete=models.CASCADE, related_name='review'
     )
     author = models.ForeignKey(
         User, on_delete=models.CASCADE, related_name='review'
     )
     text = models.TextField()
-    score = models.IntegerField()
+    score = models.IntegerField(validators=[MinValueValidator(1), MaxValueValidator(10)])
     pub_date = models.DateTimeField(
         'Review publication date', auto_now_add=True
     )
 
 
 class Comments(models.Model):
-    title_id = models.ForeignKey(
+    title = models.ForeignKey(
         Titles, on_delete=models.CASCADE, related_name='comments'
     )
     author = models.ForeignKey(
         User, on_delete=models.CASCADE, related_name='comments'
     )
-    review_id = models.ForeignKey(
+    review = models.ForeignKey(
         Reviews, on_delete=models.CASCADE, related_name='comments'
     )
     text = models.TextField()

@@ -27,10 +27,10 @@ class ReviewsSerializer(serializers.ModelSerializer):
     )
 
     class Meta:
-        exclude = ('title_id',)
+        exclude = ('title',)
         model = Reviews
         read_only_fields = ('author', 'pub_date')
-
+    '''
     def validate(self, data):
         if not isinstance(data['score'], int):
             raise serializers.ValidationError(
@@ -41,6 +41,7 @@ class ReviewsSerializer(serializers.ModelSerializer):
                 "Enter score between 0 and 10!"
             )
         return data
+'''
 
 
 class CommentsSerializer(serializers.ModelSerializer):
@@ -50,9 +51,9 @@ class CommentsSerializer(serializers.ModelSerializer):
     )
 
     class Meta:
-        exclude = ('title_id',)
+        exclude = ('title',)
         model = Comments
-        read_only_fields = ('title_id', 'review_id', 'pub_date')
+        read_only_fields = ('title', 'review', 'pub_date')
 
 
 class CategoriesSerializer(serializers.ModelSerializer):
@@ -83,11 +84,12 @@ class TitlesSerializer(serializers.ModelSerializer):
     genre = serializers.SlugRelatedField(
         slug_field='slug',
         queryset=Genres.objects.all(),
+        many=True
     )
 
     class Meta:
         model = Titles
-        fields = ('__all__')
+        fields = '__all__'
 
 
 class TitleGetSerializer(serializers.ModelSerializer):

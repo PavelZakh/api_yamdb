@@ -15,7 +15,7 @@ from rest_framework.viewsets import GenericViewSet, ModelViewSet
 from rest_framework_simplejwt.tokens import RefreshToken
 from reviews.models import Categories, Comments, Genres, Reviews, Titles, User
 
-from api.permissions import IsAdminOrSuperUser
+from api.permissions import IsAdminOrSuperUser, IsAuthenticatedOrReadOnly
 from api.serializers import (CategoriesSerializer, CommentsSerializer, 
                              ConfirmationCodeSerializer, EmailSerializer,
                              GenresSerializer, ReviewsSerializer,
@@ -87,7 +87,7 @@ class ReviewsViewSet(viewsets.ModelViewSet):
     queryset = Reviews.objects.all()
     serializer_class = ReviewsSerializer
     pagination_class = PageNumberPagination
-    # permission_classes =
+    permission_classes = (IsAuthenticatedOrReadOnly,)
 
     def perform_create(self, serializer):
         serializer.save(author=self.request.user,
@@ -96,21 +96,23 @@ class ReviewsViewSet(viewsets.ModelViewSet):
 
 class CommentsViewSet(viewsets.ModelViewSet):
     """View Set for Comments."""
-    queryset = Comments.objects.all()
     serializer_class = CommentsSerializer
     pagination_class = PageNumberPagination
-    # permission_classes =
+    permission_classes = (IsAuthenticatedOrReadOnly,)
 
     def get_queryset(self):
         review_id = self.kwargs.get("review_id")
-        get_object_or_404(Reviews, id=review_id)
-        queryset = Comments.objects.filter(review_id__exact=review_id)
+        review = get_object_or_404(Reviews, id=review_id)
+        queryset = Comments.objects.filter(review__exact=review)
         return queryset
 
     def perform_create(self, serializer):
+        review = get_object_or_404(Reviews, id=self.kwargs.get("review_id"))
+        title = get_object_or_404(Titles, id=self.kwargs.get("title_id"))
         serializer.save(author=self.request.user,
-                        title_id=self.kwargs["title_id"],
-                        review_id=self.kwargs["review_id"])
+                        title=title,
+                        review=review,
+                        )
 
 
 class TitlesViewSet(ModelViewSet):
