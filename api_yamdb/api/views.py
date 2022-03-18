@@ -105,9 +105,12 @@ class UserViewSet(viewsets.ModelViewSet):
 
 class ReviewsViewSet(viewsets.ModelViewSet):
     """View Set for Reviews."""
-    queryset = Review.objects.all()
     serializer_class = ReviewsSerializer
     permission_classes = (CommentReviewPermission,)
+
+    def get_queryset(self, *args, **kwargs):
+        title = get_object_or_404(Title, pk=self.kwargs.get('title_id'))
+        return title.review.all()
 
     def perform_create(self, serializer):
         title = get_object_or_404(Title, id=self.kwargs.get("title_id"))
