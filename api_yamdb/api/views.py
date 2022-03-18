@@ -3,9 +3,10 @@ from django.contrib.auth.tokens import default_token_generator
 from django.db import IntegrityError
 from django.core.mail import send_mail
 from django.db.models import Avg
+from django_filters.rest_framework import DjangoFilterBackend
 from django.http import HttpResponse
 from django.shortcuts import get_object_or_404
-from rest_framework import status, viewsets
+from rest_framework import status, viewsets, filters
 from rest_framework.decorators import action, api_view, permission_classes
 from rest_framework.mixins import (CreateModelMixin, DestroyModelMixin,
                                    ListModelMixin)
@@ -16,6 +17,7 @@ from rest_framework.viewsets import GenericViewSet, ModelViewSet
 from rest_framework_simplejwt.tokens import RefreshToken
 from reviews.models import Categories, Comment, Genres, Review, Title, User
 from rest_framework.exceptions import ParseError
+from reviews.filters import TitleFilter
 
 from api.permissions import IsAdminOrSuperUser, CommentReviewPermission, GenreCategoriesPermission, IsAdminOrReadOnly
 from api.serializers import (CategoriesSerializer, CommentsSerializer,
@@ -139,6 +141,8 @@ class TitlesViewSet(ModelViewSet):
     queryset = Title.objects.annotate(
         rating=Avg('review__score')).order_by('id')
     permission_classes = [IsAdminOrReadOnly]
+    filter_backends = [DjangoFilterBackend]
+    filterset_class = TitleFilter
 
     def get_serializer_class(self):
         if self.action in ('create', 'update', 'partial_update'):
@@ -151,6 +155,7 @@ class CreateListDestroyViewSet(ListModelMixin,
                                DestroyModelMixin,
                                GenericViewSet):
     pagination_class = PageNumberPagination
+    filter_backends = [filters.SearchFilter]
     # permission_classes = (GenreCategoriesPermission,)
 
 

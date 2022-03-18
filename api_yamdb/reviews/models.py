@@ -26,9 +26,6 @@ class Categories(models.Model):
     def __str__(self):
         return self.name
 
-    class Meta:
-        ordering = ['name']
-
 
 class Genres(models.Model):
     """Модель жанров произведений."""
@@ -42,9 +39,6 @@ class Genres(models.Model):
 
     def __str__(self):
         return self.name
-
-    class Meta:
-        ordering = ['name']
 
 
 class Title(models.Model):
