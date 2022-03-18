@@ -17,7 +17,7 @@ from rest_framework_simplejwt.tokens import RefreshToken
 from reviews.models import Categories, Comment, Genres, Review, Title, User
 from rest_framework.exceptions import ParseError
 
-from api.permissions import IsAdminOrSuperUser, CommentReviewPermission, GenreCategoriesPermission
+from api.permissions import IsAdminOrSuperUser, CommentReviewPermission, GenreCategoriesPermission, IsAdminOrReadOnly
 from api.serializers import (CategoriesSerializer, CommentsSerializer,
                              ConfirmationCodeSerializer, EmailSerializer,
                              GenresSerializer, ReviewsSerializer,
@@ -156,6 +156,7 @@ class CreateListDestroyViewSet(ListModelMixin,
 class CategoryViewSet(CreateListDestroyViewSet):
     queryset = Categories.objects.all().order_by('id')
     serializer_class = CategoriesSerializer
+    permission_classes = [IsAdminOrReadOnly]
     search_fields = ['name']
     lookup_field = 'slug'
 
@@ -163,5 +164,6 @@ class CategoryViewSet(CreateListDestroyViewSet):
 class GenreViewSet(CreateListDestroyViewSet):
     queryset = Genres.objects.all()
     serializer_class = GenresSerializer
+    permission_classes = [IsAdminOrReadOnly]
     search_fields = ['name']
     lookup_field = 'slug'
