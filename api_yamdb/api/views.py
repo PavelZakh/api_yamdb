@@ -1,11 +1,13 @@
+from api_yamdb.settings import EMAIL_HOST_USER
 from django.contrib.auth.tokens import default_token_generator
-from django.db import IntegrityError
 from django.core.mail import send_mail
+from django.db import IntegrityError
 from django.db.models import Avg
-from django_filters.rest_framework import DjangoFilterBackend
 from django.shortcuts import get_object_or_404
-from rest_framework import status, viewsets, filters
+from django_filters.rest_framework import DjangoFilterBackend
+from rest_framework import filters, status, viewsets
 from rest_framework.decorators import action, api_view, permission_classes
+from rest_framework.exceptions import ParseError
 from rest_framework.mixins import (CreateModelMixin, DestroyModelMixin,
                                    ListModelMixin)
 from rest_framework.pagination import PageNumberPagination
@@ -13,13 +15,11 @@ from rest_framework.permissions import AllowAny, IsAuthenticated
 from rest_framework.response import Response
 from rest_framework.viewsets import GenericViewSet, ModelViewSet
 from rest_framework_simplejwt.tokens import RefreshToken
-from reviews.models import Categories, Comment, Genres, Review, Title, User
-from rest_framework.exceptions import ParseError
 from reviews.filters import TitleFilter
+from reviews.models import Categories, Comment, Genres, Review, Title, User
 
-from api_yamdb.settings import EMAIL_HOST_USER
-from api.permissions import (IsAdminOrSuperUser, CommentReviewPermission,
-                             GenreCategoriesPermission, IsAdminOrReadOnly)
+from api.permissions import (CommentReviewPermission, IsAdminOrReadOnly,
+                             IsAdminOrSuperUser)
 from api.serializers import (CategoriesSerializer, CommentsSerializer,
                              ConfirmationCodeSerializer, EmailSerializer,
                              GenresSerializer, ReviewsSerializer,
@@ -114,7 +114,8 @@ class ReviewsViewSet(viewsets.ModelViewSet):
 
     def perform_create(self, serializer):
         title = get_object_or_404(Title, id=self.kwargs.get("title_id"))
-        if Review.objects.filter(title=title, author=self.request.user).exists():
+        author = self.request.user
+        if Review.objects.filter(title=title, author=author).exists():
             raise ParseError
         serializer.save(author=self.request.user,
                         title_id=self.kwargs["title_id"])
