@@ -26,6 +26,9 @@ class Categories(models.Model):
     def __str__(self):
         return self.name
 
+    class Meta:
+        ordering = ['name']
+
 
 class Genres(models.Model):
     """Модель жанров произведений."""
@@ -40,8 +43,11 @@ class Genres(models.Model):
     def __str__(self):
         return self.name
 
+    class Meta:
+        ordering = ['name']
 
-class Titles(models.Model):
+
+class Title(models.Model):
     """Модель произведений."""
     name = models.CharField(max_length=256, verbose_name='title name')
     year = models.IntegerField(verbose_name='year', null=True,)
@@ -55,6 +61,7 @@ class Titles(models.Model):
     class Meta:
         verbose_name = 'title'
         verbose_name_plural = 'titles'
+        ordering = ['name']
 
     def __str__(self):
         return self.name
@@ -96,10 +103,13 @@ class User(AbstractUser):
     def __str__(self):
         return self.username
 
+    class Meta:
+        ordering = ['username']
 
-class Reviews(models.Model):
+
+class Review(models.Model):
     title = models.ForeignKey(
-        Titles, on_delete=models.CASCADE, related_name='review'
+        Title, on_delete=models.CASCADE, related_name='review'
     )
     author = models.ForeignKey(
         User, on_delete=models.CASCADE, related_name='review'
@@ -110,18 +120,31 @@ class Reviews(models.Model):
         'Review publication date', auto_now_add=True
     )
 
+    class Meta:
+        constraints = [
+            models.UniqueConstraint(
+                fields=['title', 'author'],
+                name='unique_follow'
+            )
+        ]
 
-class Comments(models.Model):
+        ordering = ['pub_date']
+
+
+class Comment(models.Model):
     title = models.ForeignKey(
-        Titles, on_delete=models.CASCADE, related_name='comments'
+        Title, on_delete=models.CASCADE, related_name='comments'
     )
     author = models.ForeignKey(
         User, on_delete=models.CASCADE, related_name='comments'
     )
     review = models.ForeignKey(
-        Reviews, on_delete=models.CASCADE, related_name='comments'
+        Review, on_delete=models.CASCADE, related_name='comments'
     )
     text = models.TextField()
     pub_date = models.DateTimeField(
         'Comment publication date', auto_now_add=True
     )
+
+    class Meta:
+        ordering = ['pub_date']

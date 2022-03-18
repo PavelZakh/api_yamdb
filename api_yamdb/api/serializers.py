@@ -1,7 +1,6 @@
 from rest_framework import serializers
-from reviews.models import User
-from reviews.models import Reviews, Comments
-from reviews.models import Categories, Genres, Titles
+from reviews.models import (User, Review, Comment,
+                            Categories, Genres, Title)
 
 
 class EmailSerializer(serializers.Serializer):
@@ -29,20 +28,8 @@ class ReviewsSerializer(serializers.ModelSerializer):
 
     class Meta:
         exclude = ('title',)
-        model = Reviews
+        model = Review
         read_only_fields = ('author', 'pub_date')
-    '''
-    def validate(self, data):
-        if not isinstance(data['score'], int):
-            raise serializers.ValidationError(
-                "Enter integer score!"
-            )
-        if data['score'] not in range(11):
-            raise serializers.ValidationError(
-                "Enter score between 0 and 10!"
-            )
-        return data
-'''
 
 
 class CommentsSerializer(serializers.ModelSerializer):
@@ -53,7 +40,7 @@ class CommentsSerializer(serializers.ModelSerializer):
 
     class Meta:
         exclude = ('title',)
-        model = Comments
+        model = Comment
         read_only_fields = ('title', 'review', 'pub_date')
 
 
@@ -89,7 +76,7 @@ class TitlesSerializer(serializers.ModelSerializer):
     )
 
     class Meta:
-        model = Titles
+        model = Title
         fields = '__all__'
 
 
@@ -102,4 +89,4 @@ class TitleGetSerializer(serializers.ModelSerializer):
     class Meta:
         fields = ('id', 'name', 'year', 'rating',
                   'description', 'genre', 'category')
-        model = Titles
+        model = Title
