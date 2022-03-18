@@ -138,6 +138,7 @@ class CommentsViewSet(viewsets.ModelViewSet):
 class TitlesViewSet(ModelViewSet):
     queryset = Title.objects.annotate(
         rating=Avg('review__score')).order_by('id')
+    permission_classes = [IsAdminOrReadOnly]
 
     def get_serializer_class(self):
         if self.action in ('create', 'update', 'partial_update'):
