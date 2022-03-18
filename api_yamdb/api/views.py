@@ -35,6 +35,11 @@ def get_confirmation_code(request):
     username = serializer.data.get('username')
     if email is None:
         return Response(status=status.HTTP_400_BAD_REQUEST)
+    if username == 'me':
+        return Response(
+            {'Нельзя создавать пользователя с username me'},
+            status=status.HTTP_400_BAD_REQUEST
+        )
     if username is not None:
         try:
             User.objects.create_user(username=username, email=email)
@@ -49,7 +54,7 @@ def get_confirmation_code(request):
     mail_subject = 'Код подтверждения на Yamdb.ru'
     send_mail(mail_subject, message, EMAIL_HOST_USER, [email])
     return Response(
-        {f'На почту {email} был выслан ваш код подтверждения'},
+        serializer.data,
         status=status.HTTP_200_OK
     )
 
