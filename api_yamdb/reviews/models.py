@@ -22,6 +22,7 @@ class Categories(models.Model):
     class Meta:
         verbose_name = 'category'
         verbose_name_plural = 'categories'
+        ordering = ['name']
 
     def __str__(self):
         return self.name
@@ -36,6 +37,7 @@ class Genres(models.Model):
     class Meta:
         verbose_name = 'genre'
         verbose_name_plural = 'genres'
+        ordering = ['name']
 
     def __str__(self):
         return self.name

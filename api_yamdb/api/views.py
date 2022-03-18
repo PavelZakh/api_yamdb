@@ -1,10 +1,8 @@
-from api_yamdb.settings import EMAIL_HOST_USER
 from django.contrib.auth.tokens import default_token_generator
 from django.db import IntegrityError
 from django.core.mail import send_mail
 from django.db.models import Avg
 from django_filters.rest_framework import DjangoFilterBackend
-from django.http import HttpResponse
 from django.shortcuts import get_object_or_404
 from rest_framework import status, viewsets, filters
 from rest_framework.decorators import action, api_view, permission_classes
@@ -19,7 +17,9 @@ from reviews.models import Categories, Comment, Genres, Review, Title, User
 from rest_framework.exceptions import ParseError
 from reviews.filters import TitleFilter
 
-from api.permissions import IsAdminOrSuperUser, CommentReviewPermission, GenreCategoriesPermission, IsAdminOrReadOnly
+from api_yamdb.settings import EMAIL_HOST_USER
+from api.permissions import (IsAdminOrSuperUser, CommentReviewPermission,
+                             GenreCategoriesPermission, IsAdminOrReadOnly)
 from api.serializers import (CategoriesSerializer, CommentsSerializer,
                              ConfirmationCodeSerializer, EmailSerializer,
                              GenresSerializer, ReviewsSerializer,
@@ -109,7 +109,7 @@ class ReviewsViewSet(viewsets.ModelViewSet):
     permission_classes = (CommentReviewPermission,)
 
     def get_queryset(self, *args, **kwargs):
-        title = get_object_or_404(Title, pk=self.kwargs.get('title_id'))
+        title = get_object_or_404(Title, id=self.kwargs.get("title_id"))
         return title.review.all()
 
     def perform_create(self, serializer):
@@ -159,7 +159,6 @@ class CreateListDestroyViewSet(ListModelMixin,
                                GenericViewSet):
     pagination_class = PageNumberPagination
     filter_backends = [filters.SearchFilter]
-    # permission_classes = (GenreCategoriesPermission,)
 
 
 class CategoryViewSet(CreateListDestroyViewSet):
