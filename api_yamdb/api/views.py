@@ -115,9 +115,11 @@ class ReviewsViewSet(viewsets.ModelViewSet):
     def perform_create(self, serializer):
         title = get_object_or_404(Title, id=self.kwargs.get('title_id'))
         author = self.request.user
+        # надо придумать чо каво, не работает
+        # review = get_object_or_404(Review, title=title, author=author)
         if Review.objects.filter(title=title, author=author).exists():
             raise ParseError
-        serializer.save(author=self.request.user,
+        serializer.save(author=author,
                         title_id=self.kwargs['title_id'])
 
 
@@ -129,7 +131,7 @@ class CommentsViewSet(viewsets.ModelViewSet):
     def get_queryset(self):
         review_id = self.kwargs.get('review_id')
         review = get_object_or_404(Review, id=review_id)
-        queryset = Comment.objects.filter(review__exact=review)
+        queryset = Comment.objects.filter(review=review)
         return queryset
 
     def perform_create(self, serializer):

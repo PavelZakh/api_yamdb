@@ -112,7 +112,8 @@ class Review(models.Model):
     )
     text = models.TextField()
     score = models.IntegerField(
-        validators=[MinValueValidator(1), MaxValueValidator(10)]
+        validators=[MinValueValidator(1, 'Оценка должна быть больше 1!'),
+                    MaxValueValidator(10, 'Оценка должна быть меньше 10!')]
     )
     pub_date = models.DateTimeField(
         'Review publication date', auto_now_add=True
@@ -126,7 +127,7 @@ class Review(models.Model):
             )
         ]
 
-        ordering = ['pub_date']
+        ordering = ['-pub_date']
 
     def __str__(self):
         return self.text

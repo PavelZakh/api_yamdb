@@ -19,7 +19,7 @@ router.register(r'titles/(?P<title_id>\d+)/reviews',
 router.register(rout, CommentsViewSet, basename='Comment')
 
 urlpatterns = [
-    path('v1/', include(router.urls)),
-    path('v1/auth/signup/', get_confirmation_code),
-    path('v1/auth/token/', get_jwt_token)
+    path('v1/', include(router.urls), name='api_v1'),
+    path('v1/auth/signup/', get_confirmation_code, name='signup'),
+    path('v1/auth/token/', get_jwt_token, name='token')
 ]
