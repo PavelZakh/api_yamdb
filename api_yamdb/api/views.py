@@ -1,22 +1,22 @@
+from api_yamdb.settings import EMAIL_HOST_USER
 from django.contrib.auth.tokens import default_token_generator
 from django.core.mail import send_mail
 from django.db import IntegrityError
 from django.db.models import Avg
 from django.shortcuts import get_object_or_404
 from django_filters.rest_framework import DjangoFilterBackend
-from rest_framework import filters, status, viewsets
+from rest_framework import status, viewsets
 from rest_framework.decorators import action, api_view, permission_classes
 from rest_framework.exceptions import ParseError
-from rest_framework.mixins import (CreateModelMixin, DestroyModelMixin,
-                                   ListModelMixin)
 from rest_framework.pagination import PageNumberPagination
 from rest_framework.permissions import AllowAny, IsAuthenticated
 from rest_framework.response import Response
-from rest_framework.viewsets import GenericViewSet, ModelViewSet
+from rest_framework.viewsets import ModelViewSet
 from rest_framework_simplejwt.tokens import RefreshToken
-
 from reviews.filters import TitleFilter
 from reviews.models import Category, Comment, Genre, Review, Title, User
+
+from api.mixins import CreateListDestroyViewSet
 from api.permissions import (CommentReviewPermission, IsAdminOrReadOnly,
                              IsAdminOrSuperUser)
 from api.serializers import (CategoriesSerializer, CommentsSerializer,
@@ -24,7 +24,6 @@ from api.serializers import (CategoriesSerializer, CommentsSerializer,
                              GenresSerializer, ReviewsSerializer,
                              TitleGetSerializer, TitlesSerializer,
                              UserSerializer)
-from api_yamdb.settings import EMAIL_HOST_USER
 
 
 @api_view(['POST'])
@@ -155,14 +154,6 @@ class TitlesViewSet(ModelViewSet):
         if self.action in ('create', 'update', 'partial_update'):
             return TitlesSerializer
         return TitleGetSerializer
-
-
-class CreateListDestroyViewSet(ListModelMixin,
-                               CreateModelMixin,
-                               DestroyModelMixin,
-                               GenericViewSet):
-    pagination_class = PageNumberPagination
-    filter_backends = [filters.SearchFilter]
 
 
 class CategoryViewSet(CreateListDestroyViewSet):
