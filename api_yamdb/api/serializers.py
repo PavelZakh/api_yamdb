@@ -1,19 +1,23 @@
 from rest_framework import serializers
+
 from reviews.models import (User, Review, Comment,
-                            Categories, Genres, Title)
+                            Category, Genre, Title)
 
 
 class EmailSerializer(serializers.Serializer):
+    """Сериализатор для Email."""
     username = serializers.CharField(required=True)
     email = serializers.EmailField(required=True)
 
 
 class ConfirmationCodeSerializer(serializers.Serializer):
+    """Сериализатор для Code Confirmation."""
     username = serializers.CharField(required=True)
     confirmation_code = serializers.CharField(required=True)
 
 
 class UserSerializer(serializers.ModelSerializer):
+    """Сериализатор для модели User."""
     class Meta:
         model = User
         fields = ('username', 'email', 'first_name',
@@ -21,6 +25,7 @@ class UserSerializer(serializers.ModelSerializer):
 
 
 class ReviewsSerializer(serializers.ModelSerializer):
+    """Сериализатор для модели Review."""
     author = serializers.SlugRelatedField(
         read_only=True,
         slug_field='username'
@@ -33,6 +38,7 @@ class ReviewsSerializer(serializers.ModelSerializer):
 
 
 class CommentsSerializer(serializers.ModelSerializer):
+    """Сериализатор для модели Comment."""
     author = serializers.SlugRelatedField(
         read_only=True,
         slug_field='username'
@@ -45,33 +51,33 @@ class CommentsSerializer(serializers.ModelSerializer):
 
 
 class CategoriesSerializer(serializers.ModelSerializer):
-    """Сериализатор для модели Категорий"""
+    """Сериализатор для модели Category."""
 
     class Meta:
-        model = Categories
+        model = Category
         exclude = ('id',)
         lookup_field = 'slug'
 
 
 class GenresSerializer(serializers.ModelSerializer):
-    """Сериализатор для модели Жанров"""
+    """Сериализатор для модели Genre."""
 
     class Meta:
-        model = Genres
+        model = Genre
         exclude = ('id',)
         lookup_field = 'slug'
 
 
 class TitlesSerializer(serializers.ModelSerializer):
-    """Сериализатор для POST запросов модели Title"""
+    """Сериализатор для POST запросов модели Title."""
     category = serializers.SlugRelatedField(
         slug_field='slug',
-        queryset=Categories.objects.all(),
+        queryset=Category.objects.all(),
     )
 
     genre = serializers.SlugRelatedField(
         slug_field='slug',
-        queryset=Genres.objects.all(),
+        queryset=Genre.objects.all(),
         many=True
     )
 
@@ -81,7 +87,7 @@ class TitlesSerializer(serializers.ModelSerializer):
 
 
 class TitleGetSerializer(serializers.ModelSerializer):
-    """Серилализатор для GET запросов модели Title"""
+    """Серилализатор для GET запросов модели Title."""
     genre = GenresSerializer(many=True, read_only=True)
     category = CategoriesSerializer(read_only=True)
     rating = serializers.IntegerField(read_only=True)

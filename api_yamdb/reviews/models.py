@@ -9,7 +9,7 @@ ROLES = (
 )
 
 
-class Categories(models.Model):
+class Category(models.Model):
     """Модель категорий произведений."""
     name = models.CharField(max_length=256,
                             verbose_name='category name',
@@ -27,7 +27,7 @@ class Categories(models.Model):
         return self.name
 
 
-class Genres(models.Model):
+class Genre(models.Model):
     """Модель жанров произведений."""
     name = models.CharField(max_length=256, verbose_name='genre name',
                             unique=True)
@@ -49,9 +49,9 @@ class Title(models.Model):
     description = models.TextField(blank=True,
                                    null=True,
                                    verbose_name='description')
-    category = models.ForeignKey(Categories, on_delete=models.SET_NULL,
-                                 null=True, related_name="titles")
-    genre = models.ManyToManyField(Genres, blank=True, related_name="titles")
+    category = models.ForeignKey(Category, on_delete=models.SET_NULL,
+                                 null=True, related_name='titles')
+    genre = models.ManyToManyField(Genre, blank=True, related_name='titles')
 
     class Meta:
         verbose_name = 'title'
@@ -63,45 +63,47 @@ class Title(models.Model):
 
 
 class User(AbstractUser):
+    """Модель пользователя."""
     username = models.CharField(
         max_length=150,
         unique=True,
-        verbose_name='имя пользователя'
+        verbose_name='Имя пользователя'
     )
     email = models.EmailField(
         max_length=254,
         unique=True,
-        verbose_name='электронная почта'
+        verbose_name='Электронная почта'
     )
     first_name = models.CharField(
         max_length=150,
         null=True,
-        verbose_name='имя'
+        verbose_name='Имя'
     )
     last_name = models.CharField(
         max_length=150,
         null=True,
-        verbose_name='фамилия'
+        verbose_name='Фамилия'
     )
     bio = models.TextField(
         null=True,
-        verbose_name='информация о пользователе'
+        verbose_name='Информация о пользователе'
     )
     role = models.CharField(
         max_length=15,
         choices=ROLES,
         default='user',
-        verbose_name='пользовательская роль'
+        verbose_name='Пользовательская роль'
     )
-
-    def __str__(self):
-        return self.username
 
     class Meta:
         ordering = ['username']
 
+    def __str__(self):
+        return self.username
+
 
 class Review(models.Model):
+    """Модель отзывов на произведения."""
     title = models.ForeignKey(
         Title, on_delete=models.CASCADE, related_name='review'
     )
@@ -126,8 +128,12 @@ class Review(models.Model):
 
         ordering = ['pub_date']
 
+    def __str__(self):
+        return self.text
+
 
 class Comment(models.Model):
+    """Модель комментариев на отзывы."""
     title = models.ForeignKey(
         Title, on_delete=models.CASCADE, related_name='comments'
     )
@@ -144,3 +150,6 @@ class Comment(models.Model):
 
     class Meta:
         ordering = ['pub_date']
+
+    def __str__(self):
+        return self.text
