@@ -2,7 +2,7 @@ from django.contrib.auth.models import AbstractUser
 from django.core.validators import MaxValueValidator, MinValueValidator
 from django.db import models
 
-from .validators import my_year_validator
+from .validators import year_validator
 
 
 class Category(models.Model):
@@ -42,7 +42,7 @@ class Title(models.Model):
     """Модель произведений."""
     name = models.CharField(max_length=256, verbose_name='title name')
     year = models.IntegerField(verbose_name='year', null=True,
-                               validators=[my_year_validator],)
+                               validators=[year_validator],)
     description = models.TextField(blank=True,
                                    null=True,
                                    verbose_name='description')
