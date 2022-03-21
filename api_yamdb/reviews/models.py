@@ -2,11 +2,11 @@ from django.contrib.auth.models import AbstractUser
 from django.core.validators import MaxValueValidator, MinValueValidator
 from django.db import models
 
-ROLES = (
-    ('user', 'аутентифицированный пользователь'),
-    ('moderator', 'модератор'),
-    ('admin', 'администратор'),
-)
+
+class Role(models.TextChoices):
+    user = 'user', 'Аутентифицированный пользователь'
+    moderator = 'moderator', 'Модератор'
+    admin = 'admin', 'Администратор'
 
 
 class Category(models.Model):
@@ -67,7 +67,7 @@ class User(AbstractUser):
     username = models.CharField(
         max_length=150,
         unique=True,
-        verbose_name='Имя пользователя'
+        verbose_name='Имя пользователя',
     )
     email = models.EmailField(
         max_length=254,
@@ -90,10 +90,22 @@ class User(AbstractUser):
     )
     role = models.CharField(
         max_length=15,
-        choices=ROLES,
-        default='user',
+        choices=Role.choices,
+        default=Role.user,
         verbose_name='Пользовательская роль'
     )
+
+    @property
+    def is_admin(self):
+        return (
+            self.role == Role.admin
+            or self.is_superuser
+            or self.is_staff
+        )
+
+    @property
+    def is_moderator(self):
+        return (self.role == Role.moderator)
 
     class Meta:
         ordering = ['username']

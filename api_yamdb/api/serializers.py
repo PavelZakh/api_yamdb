@@ -9,6 +9,12 @@ class EmailSerializer(serializers.Serializer):
     username = serializers.CharField(required=True)
     email = serializers.EmailField(required=True)
 
+    def validate_username(self, value):
+        if value == 'me':
+            raise serializers.ValidationError(
+                'Нельзя создавать пользователя с username me')
+        return value
+
 
 class ConfirmationCodeSerializer(serializers.Serializer):
     """Сериализатор для Code Confirmation."""
@@ -22,6 +28,12 @@ class UserSerializer(serializers.ModelSerializer):
         model = User
         fields = ('username', 'email', 'first_name',
                   'last_name', 'bio', 'role')
+
+    def validate_username(self, value):
+        if value == 'me':
+            raise serializers.ValidationError(
+                'Нельзя создавать пользователя с username me')
+        return value
 
 
 class ReviewsSerializer(serializers.ModelSerializer):

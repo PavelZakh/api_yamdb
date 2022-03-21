@@ -17,7 +17,7 @@ from rest_framework_simplejwt.tokens import RefreshToken
 
 from reviews.filters import TitleFilter
 from reviews.models import Category, Comment, Genre, Review, Title, User
-from api.permissions import (CommentReviewPermission, IsAdminOrReadOnly,
+from api.permissions import (IsAuthorOrIsStaffPermission, IsAdminOrReadOnly,
                              IsAdminOrSuperUser)
 from api.serializers import (CategoriesSerializer, CommentsSerializer,
                              ConfirmationCodeSerializer, EmailSerializer,
@@ -31,17 +31,11 @@ from api_yamdb.settings import EMAIL_HOST_USER
 @permission_classes([AllowAny])
 def get_confirmation_code(request):
     serializer = EmailSerializer(data=request.data)
-    if not serializer.is_valid():
-        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
-    email = serializer.data.get('email')
-    username = serializer.data.get('username')
+    serializer.is_valid(raise_exception=True)
+    email = serializer.validated_data.get('email')
+    username = serializer.validated_data.get('username')
     if email is None:
         return Response(status=status.HTTP_400_BAD_REQUEST)
-    if username == 'me':
-        return Response(
-            {'Нельзя создавать пользователя с username me'},
-            status=status.HTTP_400_BAD_REQUEST
-        )
     if username is not None:
         try:
             User.objects.create_user(username=username, email=email)
@@ -65,10 +59,9 @@ def get_confirmation_code(request):
 @permission_classes([AllowAny])
 def get_jwt_token(request):
     serializer = ConfirmationCodeSerializer(data=request.data)
-    if not serializer.is_valid():
-        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
-    username = serializer.data.get('username')
-    confirmation_code = serializer.data.get('confirmation_code')
+    serializer.is_valid(raise_exception=True)
+    username = serializer.validated_data.get('username')
+    confirmation_code = serializer.validated_data.get('confirmation_code')
     user = get_object_or_404(User, username=username)
     if default_token_generator.check_token(user, confirmation_code):
         refresh = RefreshToken.for_user(user)
@@ -106,7 +99,7 @@ class UserViewSet(viewsets.ModelViewSet):
 class ReviewsViewSet(viewsets.ModelViewSet):
     """ViewSet для модели Review."""
     serializer_class = ReviewsSerializer
-    permission_classes = (CommentReviewPermission,)
+    permission_classes = (IsAuthorOrIsStaffPermission,)
 
     def get_queryset(self, *args, **kwargs):
         title = get_object_or_404(Title, id=self.kwargs.get('title_id'))
@@ -126,7 +119,7 @@ class ReviewsViewSet(viewsets.ModelViewSet):
 class CommentsViewSet(viewsets.ModelViewSet):
     """ViewSet для модели Comment."""
     serializer_class = CommentsSerializer
-    permission_classes = (CommentReviewPermission,)
+    permission_classes = (IsAuthorOrIsStaffPermission,)
 
     def get_queryset(self):
         review_id = self.kwargs.get('review_id')
