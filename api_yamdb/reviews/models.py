@@ -5,12 +5,6 @@ from django.db import models
 from .validators import my_year_validator
 
 
-class Role(models.TextChoices):
-    user = 'user', 'Аутентифицированный пользователь'
-    moderator = 'moderator', 'Модератор'
-    admin = 'admin', 'Администратор'
-
-
 class Category(models.Model):
     """Модель категорий произведений."""
     name = models.CharField(max_length=256,
@@ -67,6 +61,15 @@ class Title(models.Model):
 
 class User(AbstractUser):
     """Модель пользователя."""
+    ORDINARY_USER = 'user'
+    MODERATOR = 'moderator'
+    ADMIN = 'admin'
+    ROLES = (
+        (ORDINARY_USER, 'аутентифицированный пользователь'),
+        (MODERATOR, 'модератор'),
+        (ADMIN, 'администратор'),
+    )
+
     username = models.CharField(
         max_length=150,
         unique=True,
@@ -93,22 +96,22 @@ class User(AbstractUser):
     )
     role = models.CharField(
         max_length=15,
-        choices=Role.choices,
-        default=Role.user,
+        choices=ROLES,
+        default=ORDINARY_USER,
         verbose_name='Пользовательская роль'
     )
 
     @property
     def is_admin(self):
         return (
-            self.role == Role.admin
+            self.role == self.ADMIN
             or self.is_superuser
             or self.is_staff
         )
 
     @property
     def is_moderator(self):
-        return self.role == Role.moderator
+        return self.role == self.MODERATOR
 
     class Meta:
         ordering = ['username']
