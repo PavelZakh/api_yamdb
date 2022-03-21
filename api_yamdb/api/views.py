@@ -1,4 +1,3 @@
-from api_yamdb.settings import EMAIL_HOST_USER
 from django.contrib.auth.tokens import default_token_generator
 from django.core.mail import send_mail
 from django.db import IntegrityError
@@ -7,18 +6,15 @@ from django.shortcuts import get_object_or_404
 from django_filters.rest_framework import DjangoFilterBackend
 from rest_framework import status, viewsets
 from rest_framework.decorators import action, api_view, permission_classes
-from rest_framework.exceptions import ParseError
 from rest_framework.pagination import PageNumberPagination
 from rest_framework.permissions import AllowAny, IsAuthenticated
 from rest_framework.response import Response
 from rest_framework.viewsets import ModelViewSet
 from rest_framework_simplejwt.tokens import RefreshToken
+
+from api_yamdb.settings import EMAIL_HOST_USER
 from reviews.filters import TitleFilter
 from reviews.models import Category, Comment, Genre, Review, Title, User
-
-from api.permissions import (IsAuthorOrIsStaffPermission, IsAdminOrReadOnly)
-
-
 from api.mixins import CreateListDestroyViewSet
 from api.permissions import (IsAdminOrReadOnly, IsAuthorOrIsStaffPermission,
                              IsAdminOrSuperUser)
@@ -110,12 +106,7 @@ class ReviewsViewSet(viewsets.ModelViewSet):
     def perform_create(self, serializer):
         title = get_object_or_404(Title, id=self.kwargs.get('title_id'))
         author = self.request.user
-        # надо придумать чо каво, не работает
-        # review = get_object_or_404(Review, title=title, author=author)
-        if Review.objects.filter(title=title, author=author).exists():
-            raise ParseError
-        serializer.save(author=author,
-                        title_id=self.kwargs['title_id'])
+        serializer.save(author=author, title=title)
 
 
 class CommentsViewSet(viewsets.ModelViewSet):

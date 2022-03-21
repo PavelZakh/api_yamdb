@@ -1,4 +1,5 @@
 from rest_framework import serializers
+from django.shortcuts import get_object_or_404
 
 from reviews.models import (User, Review, Comment,
                             Category, Genre, Title)
@@ -40,8 +41,22 @@ class ReviewsSerializer(serializers.ModelSerializer):
     """Сериализатор для модели Review."""
     author = serializers.SlugRelatedField(
         read_only=True,
-        slug_field='username'
+        slug_field='username',
     )
+
+    def validate(self, data):
+        if self.context['request'].method != 'POST':
+            return data
+        title_id = self.context['view'].kwargs.get('title_id')
+        author = self.context['request'].user
+        review = Review.objects.filter(
+            author=author, title=title_id
+        )
+        if review.exists():
+            raise serializers.ValidationError(
+                'Нельзя опубликовать еще один отзыв!'
+            )
+        return data
 
     class Meta:
         exclude = ('title',)
@@ -53,7 +68,7 @@ class CommentsSerializer(serializers.ModelSerializer):
     """Сериализатор для модели Comment."""
     author = serializers.SlugRelatedField(
         read_only=True,
-        slug_field='username'
+        slug_field='username',
     )
 
     class Meta:

@@ -1,6 +1,7 @@
 from django.contrib.auth.models import AbstractUser
 from django.core.validators import MaxValueValidator, MinValueValidator
 from django.db import models
+
 from .validators import my_year_validator
 
 
@@ -107,7 +108,7 @@ class User(AbstractUser):
 
     @property
     def is_moderator(self):
-        return (self.role == Role.moderator)
+        return self.role == Role.moderator
 
     class Meta:
         ordering = ['username']
@@ -137,7 +138,7 @@ class Review(models.Model):
         constraints = [
             models.UniqueConstraint(
                 fields=['title', 'author'],
-                name='unique_follow'
+                name='unique_review'
             )
         ]
 
