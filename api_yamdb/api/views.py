@@ -15,13 +15,12 @@ from rest_framework.viewsets import ModelViewSet
 from rest_framework_simplejwt.tokens import RefreshToken
 from reviews.filters import TitleFilter
 from reviews.models import Category, Comment, Genre, Review, Title, User
-<<<<<<< HEAD
-from api.permissions import (IsAuthorOrIsStaffPermission, IsAdminOrReadOnly,
-=======
+
+from api.permissions import (IsAuthorOrIsStaffPermission, IsAdminOrReadOnly)
+
 
 from api.mixins import CreateListDestroyViewSet
-from api.permissions import (CommentReviewPermission, IsAdminOrReadOnly,
->>>>>>> 62e518181fdea858bff322047a04f7209b732781
+from api.permissions import (IsAdminOrReadOnly, IsAuthorOrIsStaffPermission,
                              IsAdminOrSuperUser)
 from api.serializers import (CategoriesSerializer, CommentsSerializer,
                              ConfirmationCodeSerializer, EmailSerializer,
