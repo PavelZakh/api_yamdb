@@ -32,6 +32,9 @@ python3 manage.py migrate
 ```
 python3 manage.py runserver
 ```
+Profit!
+
+Требования: Python 3.8 или выше
 ### Примеры запросов к API:
 
 Регистрация:
